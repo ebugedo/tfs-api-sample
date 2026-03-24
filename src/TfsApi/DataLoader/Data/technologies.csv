@@ -1,0 +1,74 @@
+NAME;DESCRIPTION
+.Net Core;.Net Core
+.Net Framework;.Net Framework
+ADFS;ADFS
+Ajax;Ajax
+Amadeus Web Services;Amadeus Web Services
+Angular;Angular
+Asp.Net Core;Asp.Net Core
+ASP.NET MVC;
+Autofac;Autofac
+Automapper;Automapper
+Azure App Services;Azure App Services
+Azure DevOps;Azure DevOps
+Azure SQL Database;Azure SQL Database
+Bootstrap;Bootstrap
+C#;Lenguaje de programación
+C4;C4
+CI/CD Azure DevOps;CI/CD Azure DevOps
+CSS3;CSS3
+Dapper;Dapper
+DDD;DDD
+DevOps;DevOps
+Docker;Docker
+Docker-compose;Docker-compose
+Entity Framework;Entity Framework
+Entity Framework Core;Entity Framework Core
+Envoy;Envoy
+git;git
+GraphQL;GraphQL
+gRPC;gRPC
+HTML5;HTML5
+Identity Server;Identity Server
+IIS;IIS
+JavaScript;JavaScript
+Jenkins;Jenkins
+JMeter;JMeter
+jQuery;jQuery
+Kanban;Kanban
+Kendo UI;Kendo UI
+Kivana;Kivana
+Kubernetes;Kubernetes
+LDAP;LDAP
+LINQ;LINQ
+LogStash;LogStash
+Microsoft Exchange;Microsoft Exchange
+MongoDB;MongoDB
+Moq;Moq
+npm;npm
+NUnit;NUnit
+Oracle;Oracle
+Postman;Postman
+RabbitMQ;RabbitMQ
+Rhino Mocks;Rhino Mocks
+Scrum;Scrum
+Seq;Seq
+Serilog;Serilog
+SignalR;SignalR
+Sonar;Sonar
+SQL Reporting Services;SQL Reporting Services
+SQL Server;SQL Server
+SurveyJS;SurveyJS
+SVN;SVN
+Swagger;Swagger
+TFS;TFS
+TypeScript;TypeScript
+Unity;Unity
+Visual Code;Visual Code
+Visual Studio;Entorno de desarrollo
+VSTS;VSTS
+Vue.js;Vue.js
+WCF;WCF
+Web API;Web API
+Windows Services;Windows services
+xUnit;xUnit
