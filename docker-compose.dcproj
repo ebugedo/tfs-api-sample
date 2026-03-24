@@ -11,9 +11,11 @@
     <AdditionalComposeFilePaths>docker-compose.dev.yml</AdditionalComposeFilePaths>
   </PropertyGroup>
   <ItemGroup>
+    <None Include=".github\workflows\docker-publish.yml" />
     <None Include="docker-compose.dev.yml" />
     <None Include="docker-compose.prod.yml" />
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
+    <None Include="DOCKER_PIPELINE_SETUP.md" />
   </ItemGroup>
 </Project>
