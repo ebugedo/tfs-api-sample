@@ -26,24 +26,49 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Paso corregido: Preparamos el nombre de la imagen (local para PRs, remoto para pushes)
       - name: Resolve Docker image name
         id: image
         shell: bash
         run: |
+          set -euo pipefail
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # For PR validation we don't have/need Docker Hub credentials.
             echo "image=local/${{ env.DOCKER_IMAGE_NAME }}" >> "$GITHUB_OUTPUT"
           else
+            if [[ -z "${{ secrets.DOCKERHUB_USERNAME }}" ]]; then
+              echo "DOCKERHUB_USERNAME secret is missing" >&2
+              exit 1
+            fi
             echo "image=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}" >> "$GITHUB_OUTPUT"
           fi
 
-      # Simplificado: GitHub Actions ya viene con Docker configurado correctamente
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Ensure default Docker context
+        run: |
+          set -e
+          echo "DOCKER_CONTEXT=${DOCKER_CONTEXT-}" || true 
+          echo "DOCKER_HOST=${DOCKER_HOST-}" || true
+          docker context ls || true
+          docker context use default || true
+          # Some runners can end up with a broken Docker context named '.'
+          docker context rm -f . 2>/dev/null || true
+          rm -rf ~/.docker/contexts/meta 2>/dev/null || true
+          docker context ls || true
+
+      - name: Set up Docker Buildx (manual)
+        env:
+          DOCKER_HOST: unix:///var/run/docker.sock
+        run: |
+          set -e
+          docker buildx version
+          docker buildx rm -f gha-builder 2>/dev/null || true
+          docker buildx create --name gha-builder --driver docker-container --use
+          docker buildx inspect --bootstrap
 
       - name: Log in to Docker Hub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
+        env:
+          DOCKER_HOST: unix:///var/run/docker.sock
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -60,27 +85,35 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            # CORRECCIÓN AQUÍ: Usamos 'sha-' como prefijo estático para evitar el error del guion inicial
+            type=semver,pattern={{major}}
             type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
+          # Make sure tags are Docker-compatible (lowercase etc.)
           labels: |
-            org.opencontainers.image.source=${{ github.event.repository.html_url }}
+            org.opencontainers.image.source=${{ github.repositoryUrl }}
+          # metadata-action normalizes tags, but keep it explicit
+          sep-tags: "\n"
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
+        env:
+          DOCKER_HOST: unix:///var/run/docker.sock
         with:
           context: ${{ env.DOCKER_CONTEXT }}
           file: ${{ env.DOCKERFILE_PATH }}
+          builder: gha-builder
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # 'load' es necesario para guardar la imagen localmente en PRs sin subirla a la nube
+          # For PRs just verify the image builds. For pushes/tags, publish.
           load: ${{ github.event_name == 'pull_request' }}
-          # Cache optimizado para Docker Hub
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:buildcache
+          cache-from: ${{ github.event_name != 'pull_request' && format('type=registry,ref={0}/{1}:buildcache', secrets.DOCKERHUB_USERNAME, env.DOCKER_IMAGE_NAME) || '' }}
           cache-to: ${{ github.event_name != 'pull_request' && format('type=registry,ref={0}/{1}:buildcache,mode=max', secrets.DOCKERHUB_USERNAME, env.DOCKER_IMAGE_NAME) || '' }}
           platforms: linux/amd64
 
       - name: Image digest
-        if: github.event_name != 'pull_request'
         run: echo ${{ steps.meta.outputs.digest }}
+
+      - name: Cleanup buildx
+        if: always()
+        run: docker buildx prune -af || true
