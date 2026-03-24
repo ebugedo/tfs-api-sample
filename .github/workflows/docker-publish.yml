@@ -29,6 +29,8 @@ jobs:
       - name: Ensure default Docker context
         run: |
           set -e
+          echo "DOCKER_CONTEXT=${DOCKER_CONTEXT-}" || true
+          echo "DOCKER_HOST=${DOCKER_HOST-}" || true
           docker context ls || true
           docker context use default || true
           # Some runners can end up with a broken Docker context named '.'
@@ -37,11 +39,13 @@ jobs:
           docker context ls || true
 
       - name: Set up Docker Buildx (manual)
+        env:
+          DOCKER_HOST: unix:///var/run/docker.sock
         run: |
           set -e
           docker buildx version
           docker buildx rm -f gha-builder 2>/dev/null || true
-          docker buildx create --name gha-builder --driver docker-container --use default
+          docker buildx create --name gha-builder --driver docker-container --use
           docker buildx inspect --bootstrap
 
       - name: Log in to Docker Hub
