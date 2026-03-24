@@ -28,8 +28,13 @@ jobs:
 
       - name: Ensure default Docker context
         run: |
+          set -e
+          docker context ls || true
           docker context use default || true
-          docker context ls
+          # Some runners can end up with a broken Docker context named '.'
+          docker context rm -f . 2>/dev/null || true
+          rm -rf ~/.docker/contexts/meta 2>/dev/null || true
+          docker context ls || true
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
