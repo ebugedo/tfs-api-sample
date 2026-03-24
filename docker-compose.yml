@@ -23,8 +23,8 @@ services:
 
 networks:
   tfs-network:
-    driver: bridge
+    driver: bridge  
 
 volumes:
   consul-data:
-    external: true  
+    # managed by docker compose (do not require pre-created external volume)
