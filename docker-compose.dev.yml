@@ -1,0 +1,15 @@
+services:
+  webapi:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - SQL_SERVER_CONNECTION_STRING=${DB_CONNECTION}
+    ports:
+      - "8080:80"   # Mapeamos un puerto externo (8080) al 80 interno
+      - "44333:443" # Mapeamos un puerto externo (44333) al 443 interno
+    volumes:
+      # Estos volúmenes solo sirven en tu PC de desarrollo
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    depends_on:
+      - consul

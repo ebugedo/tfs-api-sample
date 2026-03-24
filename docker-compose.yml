@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  consul:
+    image: hashicorp/consul:1.19
+    container_name: consul
+    restart: unless-stopped
+    ports:
+      - "8500:8500"
+    command: >
+      agent -server -bootstrap-expect=1 -ui 
+      -client=0.0.0.0 -bind=0.0.0.0 -data-dir=/consul/data
+    volumes:
+      - consul-data:/consul/data
+    networks:
+      - tfs-network  
+  webapi:
+    build:
+      context: .
+      dockerfile: src/TfsApi/WebApi/Dockerfile
+    networks:
+      - tfs-network
+
+networks:
+  tfs-network:
+    driver: bridge
+
+volumes:
+  consul-data:
+    external: true  

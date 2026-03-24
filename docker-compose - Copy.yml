@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+  webapi:
+    image: tfs.tfsapi.webapi:latest
+    build:
+      context: .
+      dockerfile: src/TfsApi/WebApi/Dockerfile
+    depends_on:
+        # - seq
+        - sqldata
+    environment:
+        - SQL_SERVER_CONNECTION_STRING=Server=sqldata;Database=TfsApiDev;User Id=sa;Password=Pass@word;Encrypt=False;
+        - LOG_LEVEL=Debug
+        - LOG_PATH=/logs
+    ports:
+        - "61477:80" 
+        - "61479:443" 
+    container_name: webapi
+  # seq:
+  #   image: datalust/seq:latest
+  #   environment:
+  #     - ACCEPT_EULA=Y
+  #   ports:
+  #     - "5104:80"
+  sqldata:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: Pass@word
+      ACCEPT_EULA: Y
+    ports:
+      - "5434:1433"

@@ -1,0 +1,9 @@
+services:
+  webapi:
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION}
+    ports:
+      - "80:80"
+    # Sin volúmenes de UserSecrets ni certificados locales
