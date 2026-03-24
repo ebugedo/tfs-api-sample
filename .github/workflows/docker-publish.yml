@@ -28,6 +28,9 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker-container
+          install: true
 
       - name: Log in to Docker Hub
         if: github.event_name != 'pull_request'
@@ -64,3 +67,7 @@ jobs:
 
       - name: Image digest
         run: echo ${{ steps.meta.outputs.digest }}
+
+      - name: Cleanup buildx
+        if: always()
+        run: docker buildx prune -af || true
