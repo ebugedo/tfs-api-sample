@@ -23,7 +23,7 @@ services:
 
 networks:
   tfs-network:
-    driver: bridge  
+    driver: bridge
 
 volumes:
   consul-data:
