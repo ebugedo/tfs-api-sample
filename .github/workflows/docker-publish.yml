@@ -73,9 +73,12 @@ jobs:
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
+        env:
+          DOCKER_HOST: unix:///var/run/docker.sock
         with:
           context: ${{ env.DOCKER_CONTEXT }}
           file: ${{ env.DOCKERFILE_PATH }}
+          builder: gha-builder
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
